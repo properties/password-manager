@@ -8,8 +8,7 @@ CREATE TABLE IF NOT EXISTS `pwd_accs` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
-INSERT INTO `pwd_accs` (`id`, `email`, `username`, `password`, `extra`, `site`) VALUES
-(5, 'properties@github.com', 'Matthew de Groot', 'password', '', 'facebook.com');
+INSERT INTO `pwd_accs` (`id`, `email`, `username`, `password`, `extra`, `site`) VALUES (5, 'properties@github.com', 'Matthew de Groot', 'password', '', 'facebook.com');
 
 CREATE TABLE IF NOT EXISTS `pwd_sites` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
