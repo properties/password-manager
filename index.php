@@ -5,7 +5,7 @@
 
   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-  $getSites = $conn->prepare("SELECT * from `pwd_sites`");
+  $getSites = $conn->prepare("SELECT * FROM `pwd_sites`");
   $getSites->execute();
 
   $allSites = $getSites->fetchAll();
