@@ -1,3 +1,4 @@
+
 CREATE TABLE IF NOT EXISTS `pwd_accs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(535) NOT NULL,
