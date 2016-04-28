@@ -19,6 +19,5 @@ CREATE TABLE IF NOT EXISTS `pwd_sites` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
-INSERT INTO `pwd_sites` (`id`, `name`, `url`, `img`) VALUES
-(2, 'Facebook', 'facebook.com', '/img/facebook.com.ico');
+INSERT INTO `pwd_sites` (`id`, `name`, `url`, `img`) VALUES (2, 'Facebook', 'facebook.com', '/img/facebook.com.ico');
 
