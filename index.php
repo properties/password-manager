@@ -1,40 +1,25 @@
 <?php
 
   session_start();
-  $_SESSION['MAINPASSWORD'] = 'PASSWORD1'; // 16char
-  $_SESSION['PHRASE'] = 'PASSWORD2';
+
+  if($_SESSION['login'] != 1)
+  {
+    header("Location: =login");
+    exit();
+  }
 
  ?>
-
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="en" id="ng-app" style="display: block;">
 <head>
 
-  <meta charset="utf-8">
   <meta name="theme-color" content="#497495">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Password Manager</title>
-  <link rel="stylesheet" href="/css/app.css">
-  <link rel="stylesheet" href="/css/desktop.css">
+  <link rel="stylesheet" href="https://web.telegram.org/css/app.css">
+  <link rel="stylesheet" href="https://web.telegram.org/css/desktop.css">
+  <link rel="stylesheet" href="/css/main.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
-  <style>
-    ::-webkit-scrollbar {
-      width: 9px;
-      -webkit-transition: none;
-      -moz-transition: none;
-      -o-transition: none;
-      transition: none;
-      background: rgba(216, 223, 225, 0.45);
-      position: absolute;
-      top: 10px;
-      right: 8px;
-   }
-
-   ::-webkit-scrollbar-thumb {
-      background: rgba(137, 160, 179, 0.5);
-   }
-  </style>
 </head>
 
 <body class="non_osx non_msie is_1x">
@@ -73,11 +58,7 @@
           <div my-dialogs-list="" class="im_dialogs_col" style="height: 482px;">
             <div class="im_dialogs_wrap nano has-scrollbar">
               <div class="im_dialogs_scrollable_wrap nano-content" tabindex="-1" style="right: -10px;">
-
-                <!-- Websites -->
                 <ul id="allSites" class="nav nav-pills nav-stacked"></ul>
-
-
           </div>
         </div>
       </div>
@@ -85,8 +66,6 @@
 
     <div class="im_history_col_wrap noselect" style="height: 550px;overflow: auto;">
       <div class="im_history_not_selected_wrap">
-
-        <!-- Accounts -->
         <div id="allAccounts" class="im_history_not_selected vertical-aligned" style="text-align: inherit;padding: 10px 10px;">
           <br><br><br><br><center><p>Choose an website</p></center>
         </div>
@@ -103,7 +82,7 @@
 
     function getSites()
     {
-      $.post( "system.php" , { ACTION:"getSites" } , function( siteInfo ){
+      $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){
         $('#allSites').html(siteInfo.Html);
       }, "json");
 
@@ -112,7 +91,7 @@
 
     function getAccounts(url)
     {
-      $.post( "system.php" , { ACTION:"getAccounts", url:url } , function( accountInfo ){
+      $.post( "=system" , { ACTION:"getAccounts", url:url } , function( accountInfo ){
         $('#allAccounts').html(accountInfo.Html);
       }, "json");
 
@@ -121,6 +100,40 @@
 
     $(document).ready(function(){
       getSites();
+    });
+
+    $(document).ready(function(){
+      $("#addSite_form").submit(function() {
+
+        $.post("=system", {
+          ACTION:"addSite",
+          name:$("#addSite_name").val(),
+          url:$("#addSite_url").val()
+        }, function() {});
+
+        $("#addSite").hide();
+        getSites();
+
+        return false;
+      });
+
+      $("#addAccount_form").submit(function() {
+
+        $.post("=system", {
+          ACTION:"addAccount",
+          url:$("#addAccount_url").val(),
+          email:$("#addAccount_email").val(),
+          username:$("#addAccount_username").val(),
+          password:$("#addAccount_password").val(),
+          extra:$("#addAccount_extra").val()
+        }, function() {});
+
+        $("#addAccount").hide();
+        getSites();
+
+        return false;
+      });
+
     });
 
     function alertHideAccount() {
@@ -139,26 +152,6 @@
       $("#addSite").show();
     }
 
-    $(document).ready(function(){
-      $("#addSite_form").submit(function() {
-        $.post("system.php", { ACTION:"addSite", name:$("#addSite_name").val(), url:$("#addSite_url").val()}, function() {});
-
-        $("#addSite").hide();
-        getSites();
-
-        return false;
-      });
-
-      $("#addAccount_form").submit(function() {
-        $.post("system.php", { ACTION:"addAccount", url:$("#addAccount_url").val(), email:$("#addAccount_email").val(), username:$("#addAccount_username").val(), password:$("#addAccount_password").val(), extra:$("#addAccount_extra").val() }, function() {});
-
-        $("#addAccount").hide();
-        getSites();
-
-        return false;
-      });
-
-    });
 
 
   </script>
