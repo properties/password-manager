@@ -7,7 +7,9 @@
      version 1.3
   */
 
-  //session_start();
+  error_reporting(0);
+
+  session_start();
   define('ACTION', $_POST['ACTION']);
   define('MAINPASSWORD', $_SESSION['MAINPASSWORD']);
   define('PHRASE', $_SESSION['PHRASE']);
@@ -87,7 +89,7 @@
     foreach($allAccounts as $accountInfo)
     {
 
-      for ($i = 1; $i <= strlen(decryptAES($accountInfo["password"])); $i++) $hiddenPassword .= "*";
+      for ($i = 1; $i <= strlen(decryptAES($accountInfo["password"])); $i++) $hiddenPassword .= "•";
 
       $htmlCode .= '<div class="md_modal_iconed_section_wrap  md_modal_iconed_section_link"style="border-bottom: 1px solid #ebebeb;"><i class="md_modal_section_icon md_modal_section_icon_more"></i><div class="md_modal_section_select_wrap">
       <div class="dropdown md_modal_section_select"><button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["email"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
@@ -102,6 +104,27 @@
     }
 
     $returnJson["Info"] = 'getAccounts -> succes';
+    $returnJson["Html"] = $htmlCode;
+
+  }
+  else if(ACTION == "loginAccount")
+  {
+
+    require_once 'GoogleAuthenticator.php';
+    $googleAuth = new PHPGangsta_GoogleAuthenticator();
+    $checkResult = $googleAuth->verifyCode("2FACODE", $_POST["C2FA"], 2);
+
+    if ($checkResult) {
+      $_SESSION['MAINPASSWORD'] = $_POST["MAINPASSWORD"];
+      $_SESSION['PHRASE'] = $_POST["PHRASE"];
+      $_SESSION['login'] = 1;
+    }
+    else
+    {
+      $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is not valid!</p>';
+    }
+
+    $returnJson["Info"] = 'loginAccount -> succes';
     $returnJson["Html"] = $htmlCode;
 
   }
