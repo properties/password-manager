@@ -21,7 +21,7 @@
     return openssl_decrypt($decryptData, AES_256_CBC, sha1(PHRASE), 1, MAINPASSWORD);
   }
 
-  $databaseConnection = new PDO("mysql:host=localhost;dbname=mattmmdn_portfolio", "mattmmdn_ee", "Core666");
+  $databaseConnection = new PDO("mysql:host=localhost;dbname=DBNAME", "DBUSER", "DBPASS");
   $databaseConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
   if(ACTION == "addAccount")
