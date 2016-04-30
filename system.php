@@ -21,7 +21,7 @@
     return openssl_decrypt($decryptData, AES_256_CBC, sha1(PHRASE), 1, MAINPASSWORD);
   }
 
-  $databaseConnection = new PDO("mysql:host=localhost;dbname=DBNAME", "DBUSER", "DBPASSWORD");
+  $databaseConnection = new PDO("mysql:host=localhost;dbname=mattmmdn_portfolio", "mattmmdn_ee", "Core666");
   $databaseConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
   if(ACTION == "addAccount")
@@ -29,11 +29,11 @@
 
     $addAccount = $databaseConnection->prepare("INSERT INTO `pwd_accs` (email, username, password, extra, site) VALUES (:email, :username, :password, :extra, :site)");
 
-    $addAccount->bindParam(':email', encryptAES(htmlspecialchars($_POST["email"])));
-    $addAccount->bindParam(':username', encryptAES(htmlspecialchars($_POST["username"])));
-    $addAccount->bindParam(':password', encryptAES(htmlspecialchars($_POST["password"])));
-    $addAccount->bindParam(':extra', encryptAES(htmlspecialchars($_POST["extra"])));
-    $addAccount->bindParam(':site', htmlspecialchars($_POST["url"]));
+    $addAccount->bindParam(':email', encryptAES($_POST["email"]));
+    $addAccount->bindParam(':username', encryptAES($_POST["username"]));
+    $addAccount->bindParam(':password', encryptAES($_POST["password"]));
+    $addAccount->bindParam(':extra', encryptAES($_POST["extra"]));
+    $addAccount->bindParam(':site', $_POST["url"]);
     $addAccount->execute();
 
     $returnJson["Info"] = 'addAccount -> succes';
@@ -90,14 +90,14 @@
       for ($i = 1; $i <= strlen(decryptAES($accountInfo["password"])); $i++) $hiddenPassword .= "*";
 
       $htmlCode .= '<div class="md_modal_iconed_section_wrap  md_modal_iconed_section_link"style="border-bottom: 1px solid #ebebeb;"><i class="md_modal_section_icon md_modal_section_icon_more"></i><div class="md_modal_section_select_wrap">
-      <div class="dropdown md_modal_section_select"><button data-clipboard-text="' . decryptAES($accountInfo["email"]) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
-      <div class="md_modal_section_param_name"><span style="color: #3a6d99;">Email:</span> ' . decryptAES($accountInfo["email"]) . '</div></div><div class="md_modal_section_select_wrap">
-      <div class="dropdown md_modal_section_select"><button data-clipboard-text="'.decryptAES($accountInfo["username"]) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
-      <div class="md_modal_section_param_name"><span style="color: #3a6d99;">Username:</span> ' . decryptAES($accountInfo["username"]) . '</div></div><div class="md_modal_section_select_wrap">
-      <div class="dropdown md_modal_section_select"><button data-clipboard-text="'. decryptAES($accountInfo["password"]) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
+      <div class="dropdown md_modal_section_select"><button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["email"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
+      <div class="md_modal_section_param_name"><span style="color: #3a6d99;">Email:</span> ' . htmlspecialchars(decryptAES($accountInfo["email"])) . '</div></div><div class="md_modal_section_select_wrap">
+      <div class="dropdown md_modal_section_select"><button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["username"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
+      <div class="md_modal_section_param_name"><span style="color: #3a6d99;">Username:</span> ' . htmlspecialchars(decryptAES($accountInfo["username"])) . '</div></div><div class="md_modal_section_select_wrap">
+      <div class="dropdown md_modal_section_select"><button data-clipboard-text="'. htmlspecialchars(decryptAES($accountInfo["password"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
       <div class="md_modal_section_param_name"><span style="color: #3a6d99;">Password:</span> '. $hiddenPassword . '</div></div><div class="md_modal_section_select_wrap">
-      <div class="dropdown md_modal_section_select"><button data-clipboard-text="' . decryptAES($accountInfo["extra"]) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
-      <div class="md_modal_section_param_name"><span style="color: #3a6d99;">Extra:</span> ' . decryptAES($accountInfo["extra"]) . '</div></div></div>';
+      <div class="dropdown md_modal_section_select"><button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["extra"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div>
+      <div class="md_modal_section_param_name"><span style="color: #3a6d99;">Extra:</span> ' . htmlspecialchars(decryptAES($accountInfo["extra"])) . '</div></div></div>';
 
     }
 
