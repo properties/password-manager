@@ -1,5 +1,8 @@
 # password-manager
-Password Manager
+
+Password Manager by @properties
+This password manager works with 2 passwords and 2FA (Google Authenticator).
+All user information is encrypted with AES256, and is only viewable/decryptable with your 2 passwords.
 
 # Install
 
