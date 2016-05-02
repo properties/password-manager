@@ -2,27 +2,39 @@
 Password Manager
 
 # Install
-This code uses GoogleAuth by @PHPGangsta and Clipboard by @zenorocha, you need to have these 2 to make this code work:
+
+Upload all the files to a host, I suggest uploading it on localhost or a SSL host for best security.
+
+First step, open lib/config.php,  and define database information and site url (for Google Auth):
+```sh
+  define('siteUrl', 'github.com');
+  define('dbHost', 'localhost');
+  define('dbName', 'properties_db');
+  define('dbUser', 'properties_user');
+  define('dbPassword', 'coolgithub');
+```
+
+After you defined your information, open install.html in your browser.
+Provide 2 passwords you want to use, main password and phrase. You need both to use the Password Manager.
+Make sure you remember the 2 passwords, if needed write it down on a piece of paper.
+All data is encrypted with AES256, if you ever lose your 2 main passwords, you lose everything!
+
+
+To use 2FA (2 Factor Authenticator), you need to install Google Authenticator on your iOS, Android or Blackberry device.
+Once installed, open the app and scan the QR code. Now click the Install button and you are done!
+The install.html file will be automaticly deleted, if it failed to delete, delete it yourself.
+
+You can now login, provide your 2 passwords and the code you see in your 2FA app.
+Once logged in, you can add site's and accounts.
+
+
+![alt tag](https://vgy.me/sMcmn1.png)
+
+![alt tag](https://vgy.me/Xd3u1G.png)
+
+
+This code uses GoogleAuth by @PHPGangsta and Clipboard by @zenorocha, you can find them here:
 ```sh
 https://github.com/zenorocha/clipboard.js
 https://github.com/PHPGangsta/GoogleAuthenticator
 ```
-
-When everything is installed, first time login with the passwords you want to use!
-2FA key needs to be added in system.php, you can generate one with the GoogleAuthenticator.
-
-```sh
-$ga = new PHPGangsta_GoogleAuthenticator();
-$secret = $ga->createSecret();
-echo "Secret is: ".$secret."\n\n";
-echo '<img src="'.$ga->getQRCodeGoogleUrl('SITEURL', $secret.'">';
-```
-The code above will generate a QR code, and provide the secret code to add in system.php.
-
-Now you can add sites and accounts, fully encrypted in AES256!
-
-![alt tag](https://vgy.me/8sCEeG.png)
-
-Tip: host website localhost or on hosting with SSL!
-
-![alt tag](https://vgy.me/9TheBn.gif)
