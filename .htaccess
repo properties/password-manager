@@ -2,3 +2,5 @@ RewriteEngine On
 
 RewriteRule    ^=login?$    login.php    [NC,L]
 RewriteRule    ^=system?$    system.php    [NC,L]
+
+Header set X-Frame-Options DENY
