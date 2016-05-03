@@ -1,4 +1,4 @@
-# password-manager
+# Password Manager
 
 Password Manager by @properties
 This password manager works with 2 passwords and 2FA (Google Authenticator).
