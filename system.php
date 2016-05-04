@@ -232,9 +232,4 @@
 
   }
 
-
   echo json_encode($returnJson, JSON_PRETTY_PRINT);
-
-
-
-?>
