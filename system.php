@@ -166,8 +166,10 @@
         }
         else
         {
+          
           $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Mainpassword or Phrase is incorrect</p>';
           $returnJson["Failed"] = 'checkPassword -> failed';
+          
         }
       }
     }
