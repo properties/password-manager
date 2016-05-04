@@ -198,7 +198,6 @@
     $installSQL->bindParam(':value2', $randomCharacters);
     $installSQL->execute();
 
-
     $currentConfig = file_get_contents('lib/config.php');
     file_put_contents('lib/config.php', $currentConfig . '  define("secret2FA", "'. $secretAuth .'");');
 
