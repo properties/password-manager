@@ -63,7 +63,6 @@
     $addAccount->execute();
 
     $returnJson["Info"] = 'addAccount -> succes';
-
   }
   else if(ACTION == "addSite")
   {
