@@ -4,7 +4,7 @@
      Password Manager
 
      by Matthew (github: properties)
-     version 1.6.4
+     version 1.6.4.1
   */
 
   include 'lib/config.php';
