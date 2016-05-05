@@ -64,6 +64,7 @@
 
     function getSites()
     {
+      checkSession();
       $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){
         $('#allSites').html(siteInfo.Html);
       }, "json");
@@ -73,6 +74,7 @@
 
     function getAccounts(url)
     {
+      checkSession();
       $.post( "=system" , { ACTION:"getAccounts", url:url } , function( accountInfo ){
         $('#allAccounts').html(accountInfo.Html);
       }, "json");
@@ -99,6 +101,7 @@
     });
 
     $(document).ready(function(){
+      checkSession();
       $("#addSite_form").submit(function() {
 
         $.post("=system", {
@@ -114,7 +117,7 @@
       });
 
       $("#addAccount_form").submit(function() {
-
+        checkSession();
         $.post("=system", {
           ACTION:"addAccount",
           url:$("#addAccount_url").val(),
@@ -133,18 +136,22 @@
     });
 
     function alertHideAccount() {
+      checkSession();
       $("#addAccount").hide();
     }
 
     function alertShowAccount() {
+      checkSession();
       $("#addAccount").show();
     }
 
     function alertHideSite() {
+      checkSession();
       $("#addSite").hide();
     }
 
     function alertShowSite() {
+      checkSession();
       $("#addSite").show();
     }
 
