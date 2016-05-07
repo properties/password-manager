@@ -119,12 +119,14 @@
       $("#addAccount_form").submit(function() {
         checkSession();
         $.post("=system", {
+          
           ACTION:"addAccount",
           url:$("#addAccount_url").val(),
           email:$("#addAccount_email").val(),
           username:$("#addAccount_username").val(),
           password:$("#addAccount_password").val(),
           extra:$("#addAccount_extra").val()
+          
         }, function() {});
 
         $("#addAccount").hide();
