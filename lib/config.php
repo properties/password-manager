@@ -5,6 +5,6 @@
   define('dbHost', 'localhost');
   define('dbName', 'name');
   define('dbUser', 'user');
-  define('dbPassword', 'pwd');
+  define('dbPassword', 'password');
 
   
