@@ -3,6 +3,8 @@
 
   define('siteUrl', 'github.com');
   define('dbHost', 'localhost');
-  define('dbName', '');
-  define('dbUser', '');
-  define('dbPassword', '');
+  define('dbName', 'name');
+  define('dbUser', 'user');
+  define('dbPassword', 'pwd');
+
+  
