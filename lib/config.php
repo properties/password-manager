@@ -6,4 +6,3 @@
   define('dbName', '');
   define('dbUser', '');
   define('dbPassword', '');
-
