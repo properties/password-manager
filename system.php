@@ -16,7 +16,6 @@
   session_name('pwdManager');
   session_start();
 
-  // Prevent session stealing
   if($_SESSION['login'] == 1 && $_SESSION['IP'] != $_SERVER['REMOTE_ADDR'])
   {
     $_SESSION = array();
@@ -28,6 +27,8 @@
   define('MAINPASSWORD', $_SESSION['MAINPASSWORD']);
   define('PHRASE', $_SESSION['PHRASE']);
   define('AES_256_CBC', 'aes-256-cbc');
+
+  $databaseConnection = new PDO("mysql:host=" . dbHost . ";dbname=" .dbName, dbUser, dbPassword);
 
   function encryptAES($encryptData) {
     return openssl_encrypt($encryptData, AES_256_CBC, PHRASE, 0, MAINPASSWORD);
@@ -50,10 +51,8 @@
       return $endString;
   }
 
-  $databaseConnection = new PDO("mysql:host=" . dbHost . ";dbname=" .dbName, dbUser, dbPassword);
-
   if(ACTION == "addAccount")
-  {  
+  {
     $addAccount = $databaseConnection->prepare("INSERT INTO `pwd_accs` (email, username, password, extra, site) VALUES (:email, :username, :password, :extra, :site)");
     $addAccount->bindParam(':email', encryptAES($_POST["email"]));
     $addAccount->bindParam(':username', encryptAES($_POST["username"]));
@@ -66,7 +65,7 @@
   {
     $addSite = $databaseConnection->prepare("INSERT INTO `pwd_sites` (name, url) VALUES (:name, :url)");
     $addSite->bindParam(':name', $_POST["name"]);
-    $addSite->bindParam(':url', ($_POST["url"]);
+    $addSite->bindParam(':url', $_POST["url"]);
     $addSite->execute();
   }
   else if(ACTION == "getSites")
@@ -119,56 +118,101 @@
   }
   else if(ACTION == "loginAccount")
   {
-    require_once 'lib/GoogleAuthenticator.php';
-    $googleAuth = new PHPGangsta_GoogleAuthenticator();
-    
-    $checkCode = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'checkpassword' LIMIT 1");
-    $checkCode->execute();
-    $theCode = $checkCode->fetch();
 
-    if($theCode["info"] != $_POST["C2FA"])
+    $getBlock = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'block' LIMIT 1");
+    $getBlock->execute();
+    $currentBlock = $getBlock->fetch();
+
+    if(time() - intval($currentBlock["value2"]) > 600)
     {
-      $checkResult = $googleAuth->verifyCode(secret2FA, $_POST["C2FA"], 2);
-      if ($checkResult) {
-        $getSettings = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'checkpassword' LIMIT 1");
-        $getSettings->execute();
-        $allSettings = $getSettings->fetch();
+      $removeBlock = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value` = '0', `value2` = '' WHERE `name` = 'block'");
+      $removeBlock->execute();
 
-        $checkPassword = openssl_decrypt($settingInfo["value"], AES_256_CBC, $_POST["PHRASE"], 0, $_POST["MAINPASSWORD"]);
-        if($checkPassword == $allSettings["value2"])
+    if($currentBlock["value"] != "3")
+    {
+
+        require_once 'lib/GoogleAuthenticator.php';
+        $googleAuth = new PHPGangsta_GoogleAuthenticator();
+
+        $checkCode = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'checkpassword' LIMIT 1");
+        $checkCode->execute();
+        $theCode = $checkCode->fetch();
+
+        if($theCode["info"] != $_POST["C2FA"])
         {
-          $_SESSION['MAINPASSWORD'] = $_POST["MAINPASSWORD"];
-          $_SESSION['PHRASE'] = $_POST["PHRASE"];
-          $_SESSION['IP'] = $_SERVER['REMOTE_ADDR'];
-          $_SESSION['login'] = 1;
-          $returnJson["Info"] = 'loginAccount -> succes';
+          $checkResult = $googleAuth->verifyCode(secret2FA, $_POST["C2FA"], 2);
+          if ($checkResult) {
+            $getSettings = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'checkpassword' LIMIT 1");
+            $getSettings->execute();
+            $allSettings = $getSettings->fetch();
 
-          $updateCode = $databaseConnection->prepare("UPDATE `pwd_settings` SET `info` = :code WHERE `name` = 'checkpassword'");
-          $updateCode->bindParam(':code', $_POST["C2FA"]);
-          $updateCode->execute();
+            $checkPassword = openssl_decrypt($settingInfo["value"], AES_256_CBC, $_POST["PHRASE"], 0, $_POST["MAINPASSWORD"]);
+            if($checkPassword == $allSettings["value2"])
+            {
+              $_SESSION['MAINPASSWORD'] = $_POST["MAINPASSWORD"];
+              $_SESSION['PHRASE'] = $_POST["PHRASE"];
+              $_SESSION['IP'] = $_SERVER['REMOTE_ADDR'];
+              $_SESSION['login'] = 1;
+              $returnJson["Info"] = 'loginAccount -> succes';
 
-        }
-        else
-        {      
-          $updateCode = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value` = :value WHERE `name` = 'block'");
-          $updateCode->bindParam(':value', "1");
-          $updateCode->execute();
-              
-          $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Mainpassword or Phrase is incorrect</p>';
-          $returnJson["Failed"] = 'checkPassword -> failed';
-        }
-      }
-        else
-        {
-          $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is not valid!</p>';
-          $returnJson["Failed"] = '2FA -> failed';
-        }
+              $updateCode = $databaseConnection->prepare("UPDATE `pwd_settings` SET `info` = :code WHERE `name` = 'checkpassword'");
+              $updateCode->bindParam(':code', $_POST["C2FA"]);
+              $updateCode->execute();
+
+            }
+            else
+            {
+
+              $getBlock = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'block' LIMIT 1");
+              $getBlock->execute();
+              $currentBlock = $getBlock->fetch();
+
+              if($currentBlock["value"] == "0")
+                $nextBlock = "1";
+              else if($currentBlock["value"] == "1")
+                $nextBlock = "2";
+              else if($currentBlock["value"] == "2")
+                $nextBlock = "3";
+              else $nextBlock = "1";
+
+              $updateCode = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value` = :value WHERE `name` = 'block'");
+              $updateCode->bindParam(':value', $nextBlock);
+              $updateCode->execute();
+
+              $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Mainpassword or Phrase is incorrect</p>';
+              $returnJson["Failed"] = 'checkPassword -> failed';
+            }
+          }
+            else
+            {
+              $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is not valid!</p>';
+              $returnJson["Failed"] = '2FA -> failed';
+            }
+          }
+          else
+          {
+            $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is already used!</p>';
+            $returnJson["Failed"] = '2FA -> failed';
+          }
       }
       else
       {
-        $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is already used!</p>';
-        $returnJson["Failed"] = '2FA -> failed';
+        if(empty($currentBlock["value2"]))
+        {
+          $setTime = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value2` = :value WHERE `name` = 'block'");
+          $setTime->bindParam(':value', time());
+          $setTime->execute();
+
+          $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Login blocked for 10 minutes</p>';
+          $returnJson["Failed"] = 'Blocked -> failed';
+        }
       }
+    }
+    else
+    {
+      $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Login blocked for 10 minutes</p>';
+      $returnJson["Failed"] = 'Blocked -> failed';
+    }
 
     $returnJson["Html"] = $htmlCode;
 
