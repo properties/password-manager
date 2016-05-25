@@ -102,7 +102,7 @@
       $siteAmount = $getSiteAmount->rowCount();
 
       if(empty($siteInfo["img"])) $siteInfo["img"] = 'http://'. htmlspecialchars(decryptAES($siteInfo["url"])) .'/favicon.ico';
-      $htmlCode .= '<li class="im_dialog_wrap"><a class="im_dialog" onclick="getAccounts(\''. htmlspecialchars(decryptAES($siteInfo["url"])) .'\')"><div class="im_dialog_meta pull-right text-right"><div class="im_dialog_date">'. htmlspecialchars(decryptAES($siteInfo["url"])) .'</div></div><div class="im_dialog_photo pull-left" style="border-radius:0%;"><img class="im_dialog_photo" style="border-radius:0%;" src="'. htmlspecialchars(decryptAES($siteInfo["img"])) .'"></div> <div class="im_dialog_message_wrap"><div class="im_dialog_peer"><span>'. htmlspecialchars(decryptAES($siteInfo["name"])) .'</span></div><div class="im_dialog_message_notyping"><div class="im_dialog_message"><span><span><span class="im_dialog_chat_from_wrap"><span class="im_dialog_chat_from">Accounts</span><span>:</span></span></span></span><span><span class="im_short_message_text">'. htmlspecialchars($siteAmount) .'</span></span></div></div></div></a></li>';
+      $htmlCode .= '<li class="im_dialog_wrap"><a class="im_dialog" onclick="getAccounts(\''. htmlspecialchars(decryptAES($siteInfo["url"])) .'\')"><div class="im_dialog_meta pull-right text-right"><div class="im_dialog_date">'. htmlspecialchars(decryptAES($siteInfo["url"])) .'</div></div><div class="im_dialog_photo pull-left" style="border-radius:0%;"><img class="im_dialog_photo" style="border-radius:0%;" src="'. htmlspecialchars($siteInfo["img"]) .'"></div> <div class="im_dialog_message_wrap"><div class="im_dialog_peer"><span>'. htmlspecialchars(decryptAES($siteInfo["name"])) .'</span></div><div class="im_dialog_message_notyping"><div class="im_dialog_message"><span><span><span class="im_dialog_chat_from_wrap"><span class="im_dialog_chat_from">Accounts</span><span>: </span></span></span></span><span><span class="im_short_message_text">'. htmlspecialchars($siteAmount) .'</span></span></div></div></div></a></li>';
       $returnJson["Html"] = $htmlCode;
     }
   }
@@ -150,7 +150,7 @@
             $getSettings->execute();
             $allSettings = $getSettings->fetch();
 
-            $checkPassword = openssl_decrypt($settingInfo["value"], AES_256_CBC, $_POST["PHRASE"], 0, $_POST["MAINPASSWORD"]);
+            $checkPassword = openssl_decrypt($allSettings["value"], AES_256_CBC, $_POST["PHRASE"], 0, $_POST["MAINPASSWORD"]);
             if($checkPassword == $allSettings["value2"])
             {
               $_SESSION['MAINPASSWORD'] = $_POST["MAINPASSWORD"];
