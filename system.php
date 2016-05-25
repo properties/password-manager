@@ -4,18 +4,20 @@
      Password Manager
 
      by Matthew (github: properties)
-     version 1.3
+     version 1.5.2
   */
 
   include 'lib/config.php';
 
   error_reporting(0);
 
+  #=> Session settings
   ini_set('session.gc_maxlifetime', 3600);
   session_set_cookie_params(3600);
   session_name('pwdManager');
   session_start();
 
+  #=> Prevent session stealing (IP Locked)
   if($_SESSION['login'] == 1 && $_SESSION['IP'] != $_SERVER['REMOTE_ADDR'])
   {
     $_SESSION = array();
@@ -23,32 +25,61 @@
     exit();
   }
 
+  #=> Define passwords and AES
   define('ACTION', $_POST['ACTION']);
   define('MAINPASSWORD', $_SESSION['MAINPASSWORD']);
   define('PHRASE', $_SESSION['PHRASE']);
   define('AES_256_CBC', 'aes-256-cbc');
 
+  #=> Create database connection
   $databaseConnection = new PDO("mysql:host=" . dbHost . ";dbname=" .dbName, dbUser, dbPassword);
 
+  #=> Encrypting in AES function
   function encryptAES($encryptData) {
     return openssl_encrypt($encryptData, AES_256_CBC, PHRASE, 0, MAINPASSWORD);
   }
 
+  #=> Decrypting in AES function
   function decryptAES($decryptData) {
     return openssl_decrypt($decryptData, AES_256_CBC, PHRASE, 0, MAINPASSWORD);
   }
 
-  function randomChars($totalLenght, $allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+  #=> Create random characters
+  function randomChars($totalLenght, $allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", $resultString = "")
   {
-      $endString = "";
-      $totalChars = strlen($allChars);
       for ($i = 0; $i < $totalLenght; $i++)
       {
-          $randomPick = mt_rand(1, $totalChars);
-          $randomChar = $allChars[$randomPick-1];
-          $endString .= $randomChar;
+          $resultString .= $allChars[mt_rand(1, 62)-1];
       }
-      return $endString;
+      return $resultString;
+  }
+
+  function blockLogin()
+  {
+    $getBlock = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'block' LIMIT 1");
+    $getBlock->execute();
+    $currentBlock = $getBlock->fetch();
+
+    if($currentBlock["value"] == "0")
+    {
+      $nextBlock = "1";
+    }
+    else if($currentBlock["value"] == "1")
+    {
+      $nextBlock = "2";
+    }
+    else if($currentBlock["value"] == "2")
+    {
+      $nextBlock = "3";
+    }
+    else {
+      $nextBlock = "1";
+    }
+
+    $updateCode = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value` = :value WHERE `name` = 'block'");
+    $updateCode->bindParam(':value', $nextBlock);
+    $updateCode->execute();
+    return true;
   }
 
   if(ACTION == "addAccount")
@@ -58,14 +89,14 @@
     $addAccount->bindParam(':username', encryptAES($_POST["username"]));
     $addAccount->bindParam(':password', encryptAES($_POST["password"]));
     $addAccount->bindParam(':extra', encryptAES($_POST["extra"]));
-    $addAccount->bindParam(':site', $_POST["url"]);
+    $addAccount->bindParam(':site', encryptAES($_POST["url"]));
     $addAccount->execute();
   }
   else if(ACTION == "addSite")
   {
     $addSite = $databaseConnection->prepare("INSERT INTO `pwd_sites` (name, url) VALUES (:name, :url)");
-    $addSite->bindParam(':name', $_POST["name"]);
-    $addSite->bindParam(':url', $_POST["url"]);
+    $addSite->bindParam(':name', encryptAES($_POST["name"]));
+    $addSite->bindParam(':url', encryptAES($_POST["url"]));
     $addSite->execute();
   }
   else if(ACTION == "getSites")
@@ -82,12 +113,12 @@
       $getSiteAmount->execute();
       $siteAmount = $getSiteAmount->rowCount();
 
-      if(empty($siteInfo["img"])) $siteInfo["img"] = 'http://'. htmlspecialchars($siteInfo["url"]) .'/favicon.ico';
+      if(empty($siteInfo["img"])) $siteInfo["img"] = 'http://'. htmlspecialchars(decryptAES($siteInfo["url"])) .'/favicon.ico';
 
-      $htmlCode .= '<li class="im_dialog_wrap"><a class="im_dialog" onclick="getAccounts(\''. htmlspecialchars($siteInfo["url"]) .'\')">
-      <div class="im_dialog_meta pull-right text-right"><div class="im_dialog_date">'. htmlspecialchars($siteInfo["url"]) .'</div></div>
-      <div class="im_dialog_photo pull-left" style="border-radius:0%;"><img class="im_dialog_photo" style="border-radius:0%;" src="'. htmlspecialchars($siteInfo["img"]) .'"></div> <div class="im_dialog_message_wrap">
-      <div class="im_dialog_peer"><span>'. htmlspecialchars($siteInfo["name"]) .'</span></div><div class="im_dialog_message_notyping"><div class="im_dialog_message"><span><span><span class="im_dialog_chat_from_wrap"><span class="im_dialog_chat_from">Accounts</span><span>:</span></span></span></span><span>
+      $htmlCode .= '<li class="im_dialog_wrap"><a class="im_dialog" onclick="getAccounts(\''. htmlspecialchars(decryptAES($siteInfo["url"])) .'\')">
+      <div class="im_dialog_meta pull-right text-right"><div class="im_dialog_date">'. htmlspecialchars(decryptAES($siteInfo["url"])) .'</div></div>
+      <div class="im_dialog_photo pull-left" style="border-radius:0%;"><img class="im_dialog_photo" style="border-radius:0%;" src="'. htmlspecialchars(decryptAES($siteInfo["img"])) .'"></div> <div class="im_dialog_message_wrap">
+      <div class="im_dialog_peer"><span>'. htmlspecialchars(decryptAES($siteInfo["name"])) .'</span></div><div class="im_dialog_message_notyping"><div class="im_dialog_message"><span><span><span class="im_dialog_chat_from_wrap"><span class="im_dialog_chat_from">Accounts</span><span>:</span></span></span></span><span>
       <span class="im_short_message_text">'. htmlspecialchars($siteAmount) .'</span></span></div></div></div></a></li>';
 
       $returnJson["Html"] = $htmlCode;
@@ -97,7 +128,7 @@
   else if(ACTION == "getAccounts")
   {
     $getAccounts = $databaseConnection->prepare("SELECT * from `pwd_accs` WHERE `site` = :url");
-    $getAccounts->bindParam(':url', $_POST["url"]);
+    $getAccounts->bindParam(':url', encryptAES($_POST["url"]));
     $getAccounts->execute();
     $allAccounts = $getAccounts->fetchall();
 
@@ -118,7 +149,6 @@
   }
   else if(ACTION == "loginAccount")
   {
-
     $getBlock = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'block' LIMIT 1");
     $getBlock->execute();
     $currentBlock = $getBlock->fetch();
@@ -128,9 +158,8 @@
       $removeBlock = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value` = '0', `value2` = '' WHERE `name` = 'block'");
       $removeBlock->execute();
 
-    if($currentBlock["value"] != "3")
-    {
-
+      if($currentBlock["value"] != "3")
+      {
         require_once 'lib/GoogleAuthenticator.php';
         $googleAuth = new PHPGangsta_GoogleAuthenticator();
 
@@ -162,60 +191,45 @@
             }
             else
             {
-
-              $getBlock = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'block' LIMIT 1");
-              $getBlock->execute();
-              $currentBlock = $getBlock->fetch();
-
-              if($currentBlock["value"] == "0")
-                $nextBlock = "1";
-              else if($currentBlock["value"] == "1")
-                $nextBlock = "2";
-              else if($currentBlock["value"] == "2")
-                $nextBlock = "3";
-              else $nextBlock = "1";
-
-              $updateCode = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value` = :value WHERE `name` = 'block'");
-              $updateCode->bindParam(':value', $nextBlock);
-              $updateCode->execute();
-
+              blockLogin();
               $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Mainpassword or Phrase is incorrect</p>';
               $returnJson["Failed"] = 'checkPassword -> failed';
             }
           }
             else
             {
+              blockLogin();
               $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is not valid!</p>';
               $returnJson["Failed"] = '2FA -> failed';
             }
           }
           else
           {
+            blockLogin();
             $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is already used!</p>';
             $returnJson["Failed"] = '2FA -> failed';
           }
+        }
+        else
+        {
+          if(empty($currentBlock["value2"]))
+          {
+            $setTime = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value2` = :value WHERE `name` = 'block'");
+            $setTime->bindParam(':value', time());
+            $setTime->execute();
+
+            $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Login blocked for 10 minutes</p>';
+            $returnJson["Failed"] = 'Blocked -> failed';
+          }
+        }
       }
       else
       {
-        if(empty($currentBlock["value2"]))
-        {
-          $setTime = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value2` = :value WHERE `name` = 'block'");
-          $setTime->bindParam(':value', time());
-          $setTime->execute();
-
-          $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Login blocked for 10 minutes</p>';
-          $returnJson["Failed"] = 'Blocked -> failed';
-        }
+        $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Login blocked for 10 minutes</p>';
+        $returnJson["Failed"] = 'Blocked -> failed';
       }
-    }
-    else
-    {
-      $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Login blocked for 10 minutes</p>';
-      $returnJson["Failed"] = 'Blocked -> failed';
-    }
 
     $returnJson["Html"] = $htmlCode;
-
   }
   else if(ACTION == "installSite")
   {
@@ -226,7 +240,7 @@
     $randomCharacters = randomChars(16);
     $randomEncryption = openssl_encrypt($randomCharacters, AES_256_CBC, $phrasePassword, 0, $mainPassword);
 
-    $installSQL = $databaseConnection->prepare("CREATE TABLE IF NOT EXISTS `pwd_accs` (`id` int(11) NOT NULL AUTO_INCREMENT,`email` varchar(535) NOT NULL,`username` varchar(535) NOT NULL,`password` varchar(535) NOT NULL,`extra` varchar(535) NOT NULL,`site` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;CREATE TABLE IF NOT EXISTS `pwd_settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`value` varchar(535) NOT NULL,`value2` varchar(535) NOT NULL,`info` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;CREATE TABLE IF NOT EXISTS `pwd_sites` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`url` varchar(535) NOT NULL,`img` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=49;INSERT INTO `pwd_settings` (name, value, value2) VALUES ('checkpassword', :value, :value2)");
+    $installSQL = $databaseConnection->prepare("CREATE TABLE IF NOT EXISTS `pwd_accs` (`id` int(11) NOT NULL AUTO_INCREMENT,`email` varchar(535) NOT NULL,`username` varchar(535) NOT NULL,`password` varchar(535) NOT NULL,`extra` varchar(535) NOT NULL,`site` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;CREATE TABLE IF NOT EXISTS `pwd_settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`value` varchar(535) NOT NULL,`value2` varchar(535) NOT NULL,`info` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;CREATE TABLE IF NOT EXISTS `pwd_sites` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`url` varchar(535) NOT NULL,`img` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=49;INSERT INTO `pwd_settings` (name, value, value2) VALUES ('block', '', '');INSERT INTO `pwd_settings` (name, value, value2) VALUES ('checkpassword', :value, :value2)");
     $installSQL->bindParam(':value', $randomEncryption);
     $installSQL->bindParam(':value2', $randomCharacters);
     $installSQL->execute();
