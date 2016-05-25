@@ -54,25 +54,21 @@
   }
 
   #=> Block login if failed login
-  function blockLogin()
+  function blockLogin($currentTry)
   {
-    $getBlock = $databaseConnection->prepare("SELECT * from `pwd_settings` WHERE `name` = 'block' LIMIT 1");
-    $getBlock->execute();
-    $currentBlock = $getBlock->fetch();
+    if        ($currentTry == "0")   $nextBlock = "1";
+    else if   ($currentTry == "1")   $nextBlock = "2";
+    else if   ($currentTry == "2")   $nextBlock = "3";
+    else                             $nextBlock = "1";
 
-    #=> Update current login try
-    if($currentBlock["value"] == "0")        $nextBlock = "1";
-    else if($currentBlock["value"] == "1")   $nextBlock = "2";
-    else if($currentBlock["value"] == "2")   $nextBlock = "3";
-    else                                     $nextBlock = "1";
-
+    $databaseConnection = new PDO("mysql:host=" . dbHost . ";dbname=" .dbName, dbUser, dbPassword);
     $updateCode = $databaseConnection->prepare("UPDATE `pwd_settings` SET `value` = :value WHERE `name` = 'block'");
     $updateCode->bindParam(':value', $nextBlock);
     $updateCode->execute();
   }
 
   #=> Check ACTION
-  
+
   #=> Add account to database
   if(ACTION == "addAccount")
   {
@@ -169,21 +165,21 @@
             }
             else
             {
-              blockLogin();
+              blockLogin($currentBlock["value"]);
               $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Mainpassword or Phrase is incorrect</p>';
               $returnJson["Failed"] = 'checkPassword -> failed';
             }
           }
             else
             {
-              blockLogin();
+              blockLogin($currentBlock["value"]);
               $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is not valid!</p>';
               $returnJson["Failed"] = '2FA -> failed';
             }
           }
           else
           {
-            blockLogin();
+            blockLogin($currentBlock["value"]);
             $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">2FA Code is already used!</p>';
             $returnJson["Failed"] = '2FA -> failed';
           }
@@ -206,7 +202,7 @@
         $htmlCode = '<p style="color: #c7254e;background-color: #f9f2f4;width: 500px;padding: 2px 4px;font-size: 90%;border-radius: 4px;">Login blocked for 10 minutes</p>';
         $returnJson["Failed"] = 'Blocked -> failed';
       }
-      
+
       $returnJson["Html"] = $htmlCode;
   }
   #=> Install site
