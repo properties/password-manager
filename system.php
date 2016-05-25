@@ -208,21 +208,31 @@
   #=> Install site
   else if(ACTION == "installSite")
   {
-    $secretAuth = $_POST["secretAuth"];
-    $mainPassword = $_POST["mainPassword"];
-    $phrasePassword = $_POST["phrasePassword"];
+    $checkInstall = $databaseConnection->prepare("SHOW TABLE LIKE 'pwd_settings'");
+    $checkInstall->execute();
+    $siteInstalled = $checkInstall->rowCount();
 
-    $randomCharacters = randomChars(16);
-    $randomEncryption = openssl_encrypt($randomCharacters, AES_256_CBC, $phrasePassword, 0, $mainPassword);
+    if($siteInstalled > 0)
+    {
+      $secretAuth = $_POST["secretAuth"];
+      $mainPassword = $_POST["mainPassword"];
+      $phrasePassword = $_POST["phrasePassword"];
 
-    $installSQL = $databaseConnection->prepare("CREATE TABLE IF NOT EXISTS `pwd_accs` (`id` int(11) NOT NULL AUTO_INCREMENT,`email` varchar(535) NOT NULL,`username` varchar(535) NOT NULL,`password` varchar(535) NOT NULL,`extra` varchar(535) NOT NULL,`site` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;CREATE TABLE IF NOT EXISTS `pwd_settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`value` varchar(535) NOT NULL,`value2` varchar(535) NOT NULL,`info` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;CREATE TABLE IF NOT EXISTS `pwd_sites` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`url` varchar(535) NOT NULL,`img` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=49;INSERT INTO `pwd_settings` (name, value, value2) VALUES ('block', '', '');INSERT INTO `pwd_settings` (name, value, value2) VALUES ('checkpassword', :value, :value2)");
-    $installSQL->bindParam(':value', $randomEncryption);
-    $installSQL->bindParam(':value2', $randomCharacters);
-    $installSQL->execute();
+      $randomCharacters = randomChars(16);
+      $randomEncryption = openssl_encrypt($randomCharacters, AES_256_CBC, $phrasePassword, 0, $mainPassword);
 
-    $currentConfig = file_get_contents('lib/config.php');
-    file_put_contents('lib/config.php', $currentConfig . '  define("secret2FA", "'. $secretAuth .'");');
-    unlink('install.html');
+      $installSQL = $databaseConnection->prepare("CREATE TABLE IF NOT EXISTS `pwd_accs` (`id` int(11) NOT NULL AUTO_INCREMENT,`email` varchar(535) NOT NULL,`username` varchar(535) NOT NULL,`password` varchar(535) NOT NULL,`extra` varchar(535) NOT NULL,`site` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;CREATE TABLE IF NOT EXISTS `pwd_settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`value` varchar(535) NOT NULL,`value2` varchar(535) NOT NULL,`info` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;CREATE TABLE IF NOT EXISTS `pwd_sites` (`id` int(11) NOT NULL AUTO_INCREMENT,`name` varchar(535) NOT NULL,`url` varchar(535) NOT NULL,`img` varchar(535) NOT NULL,PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=49;INSERT INTO `pwd_settings` (name, value, value2) VALUES ('block', '', '');INSERT INTO `pwd_settings` (name, value, value2) VALUES ('checkpassword', :value, :value2)");
+      $installSQL->bindParam(':value', $randomEncryption);
+      $installSQL->bindParam(':value2', $randomCharacters);
+      $installSQL->execute();
+
+      $currentConfig = file_get_contents('lib/config.php');
+      file_put_contents('lib/config.php', $currentConfig . '  define("secret2FA", "'. $secretAuth .'");');
+      unlink('install.html');
+    }
+    else {
+      $returnJson["Failed"] = 'installSite -> Site already installed';
+    }
   }
   #=> Generate QR code for Google Auth install
   else if(ACTION == "generateQR")
@@ -241,7 +251,6 @@
   {
     if($_SESSION['login'] == 1)
       $returnJson["valid"] = 'session -> valid';
-    $returnJson["Info"] = 'checkSession -> succes';
   }
 
   #=> Echo result
