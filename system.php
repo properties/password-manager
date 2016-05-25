@@ -208,6 +208,10 @@
   #=> Install site
   else if(ACTION == "installSite")
   {
+    $secretAuth = $_POST["secretAuth"];
+    $mainPassword = $_POST["mainPassword"];
+    $phrasePassword = $_POST["phrasePassword"];
+
     $checkInstall = $databaseConnection->prepare("SHOW TABLE LIKE 'pwd_settings'");
     $checkInstall->execute();
     $siteInstalled = $checkInstall->rowCount();
