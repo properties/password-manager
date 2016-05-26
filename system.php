@@ -2,7 +2,7 @@
 
   #=> Password Manager
   #=> by Matthew (github: properties)
-  #=> version 1.5.7
+  #=> version 1.7.7
 
   #=> Include config file
   include 'lib/config.php';
