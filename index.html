@@ -65,6 +65,20 @@
                   <br><br>
                 </div>
 
+                <div id="addSite" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
+                  <div class="im_dialogs_search">
+                    <form id="addSite_form" action="#add" class="modal_simple_form">
+                      <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Site URL" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addSite_name" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Email" autocomplete="off">
+                      <div style="margin-top: 10px;">
+                        <button class="btn reply_markup_button" type="submit" style="float: right;width:48%;">Add site</button>
+                        <button onclick="alertHideSite()" class="btn reply_markup_button" style="float: right;width:48%;margin-right: 11px;">Cancel</button>
+                      </div>
+                    </form>
+                  </div>
+                  <br><br>
+                </div>
+
                 <ul id="allSites" class="nav nav-pills nav-stacked"></ul>
           </div>
         </div>
@@ -186,42 +200,6 @@
     }
 
   </script>
-
-  <div id="addSite" style="display:none">
-    <div class="modal-backdrop fade in" style="z-index: 1051;"></div>
-    <div tabindex="-1" role="dialog" class="modal fade md_simple_modal_window mobile_modal in" style="z-index: 1060; display: block;">
-      <div onclick="alertHideSite()" class="modal_close_wrap"><div class="modal_close"></div></div>
-        <div class="modal-dialog"><div class="modal-content modal-content-animated" style="margin-top: 153.5px;"><div class="md_simple_modal_wrap">
-
-          <div class="md_simple_modal_body">
-
-            <form id="addSite_form" action="#add" class="modal_simple_form ng-pristine ng-valid">
-
-              <h4 my-i18n="profile_edit_modal_title">Add Site</h4>
-
-              <div class="md-input-group md-input-has-value md-input-animated">
-                <label class="md-input-label">Site URL</label>
-                <input id="addSite_url" class="md-input" type="text">
-              </div>
-
-              <div class="md-input-group md-input-has-value md-input-animated">
-                <label class="md-input-label">Name</label>
-                <input id="addSite_name" class="md-input" type="text">
-              </div>
-
-              <div class="md_simple_modal_footer">
-                <button type="button" class="btn btn-md" onclick="alertHideSite()">Cancel</button>
-                <button type="submit" class="btn btn-md btn-md-primary">Save</button>
-              </div>
-
-            </form>
-
-          </div>
-
-        </div>
-      </div></div>
-    </div>
-  </div>
 
 </body>
 </html>
