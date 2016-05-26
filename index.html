@@ -44,21 +44,22 @@
             </div>
           </div>
 
-          <div my-dialogs-list="" class="im_dialogs_col" style="height: 482px;">
+          <div my-dialogs-list="" class="im_dialogs_col" style="height: 492px;">
             <div class="im_dialogs_wrap nano has-scrollbar">
               <div class="im_dialogs_scrollable_wrap nano-content" tabindex="-1" style="right: -10px;">
 
                 <div id="addAccount" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
-                    <form id="addAccount_form" action="#add" class="modal_simple_form">
+                    <form id="addAccount_form" action="#add">
                       <input style="margin-bottom: 10px;" id="addAccount_url" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Site URL" autocomplete="off">
                       <input style="margin-bottom: 10px;" id="addAccount_email" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Email" autocomplete="off">
                       <input style="margin-bottom: 10px;" id="addAccount_username" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Username"  autocomplete="off">
                       <input style="margin-bottom: 10px;" id="addAccount_extra" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Extra"  autocomplete="off">
                       <input hidden id="addAccount_password">
                       <div style="margin-top: 10px;">
-                        <button class="btn reply_markup_button" type="submit" style="float: right;width:48%;">Add account</button>
-                        <button onclick="alertHideAccount()" class="btn reply_markup_button" style="float: right;width:48%;margin-right: 11px;">Cancel</button>
+                        <button class="btn reply_markup_button" type="submit" style="float: right;width:31%;">Add account</button>
+                        <button data-clipboard-text="" id="copyPassword" type="button" class="btn reply_markup_button copy" style="float: right;width:34%;margin-right: 5.5px;">Copy password</button>
+                        <button onclick="alertHideAccount()" type="button" class="btn reply_markup_button" style="float: right;width:31%;margin-right: 5.5px;">Cancel</button>
                       </div>
                     </form>
                   </div>
@@ -67,7 +68,7 @@
 
                 <div id="addSite" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
-                    <form id="addSite_form" action="#add" class="modal_simple_form">
+                    <form id="addSite_form" action="#add">
                       <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Site URL" autocomplete="off">
                       <input style="margin-bottom: 10px;" id="addSite_name" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Email" autocomplete="off">
                       <div style="margin-top: 10px;">
@@ -85,7 +86,7 @@
       </div>
     </div>
 
-    <div class="im_history_col_wrap noselect" style="height: 550px;overflow: auto;">
+    <div class="im_history_col_wrap noselect" style="height: 600px;overflow: auto;">
       <div class="im_history_not_selected_wrap">
         <div id="allAccounts" class="im_history_not_selected vertical-aligned" style="text-align: inherit;padding: 10px 10px;">
           <br><br><br><br><center><p>Choose an website</p></center>
@@ -171,12 +172,14 @@
 
     });
 
-    function alertHideAccount() {
+    function
+    alertHideAccount() {
       $("#addAccount").hide();
     }
 
     function alertShowAccount() {
       $("#addAccount").show();
+      alertHideSite();
       randomPassword();
     }
 
@@ -185,6 +188,7 @@
     }
 
     function alertShowSite() {
+      alertHideAccount();
       $("#addSite").show();
     }
 
@@ -197,6 +201,8 @@
       var result = '';
       for (var i = length; i > 0; --i) result += mask[Math.round(Math.random() * (mask.length - 1))];
       document.getElementById("addAccount_password").value = result;
+      document.getElementById('copyPassword').setAttribute('data-clipboard-text', result);
+      //copyPassword
     }
 
   </script>
