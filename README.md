@@ -2,7 +2,7 @@
 
 Password Manager by @properties
 This password manager works with 2 passwords and 2FA (Google Authenticator).
-All user information is encrypted with AES256, and is only viewable/decryptable with your 2 passwords.
+All user information and sites are encrypted with AES256, and is only viewable/decryptable with your 2 passwords.
 
 # Install
 
@@ -33,7 +33,7 @@ Once logged in, you can add site's and accounts.
 
 ![alt tag](https://vgy.me/sMcmn1.png)
 
-![alt tag](https://vgy.me/Xd3u1G.png)
+![alt tag](https://vgy.me/HXP951.gif)
 
 
 This code uses GoogleAuth by @PHPGangsta and Clipboard by @zenorocha, you can find them here:
