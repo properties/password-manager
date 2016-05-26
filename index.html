@@ -9,10 +9,9 @@
 </head>
 
 <body id="showSite" style="display:none" class="non_osx non_msie is_1x">
-
   <br><br>
-  <div class="page_wrap" ng-view="">
-    <div my-head="">
+  <div class="page_wrap">
+    <div>
       <div class="tg_page_head tg_head_wrap noselect clearfix">
         <div class="tg_head_split">
           <div class="tg_head_main_wrap"></div>
@@ -21,13 +20,11 @@
     </div>
 
     <div class="im_page_wrap clearfix im_page_peer_not_selected">
-
       <div class="im_page_split clearfix">
-
         <div class="im_dialogs_col_wrap noselect">
           <div class="im_dialogs_panel">
             <div class="im_dialogs_search">
-              <input class="form-control im_dialogs_search_field no_outline ng-pristine ng-untouched ng-valid" type="search" placeholder="Search" ng-model="search.query" autocomplete="off">
+              <input class="form-control im_dialogs_search_field no_outline" type="search" placeholder="Search" autocomplete="off">
               <a class="im_dialogs_search_clear tg_search_clear ng-hide">
                 <i class="icon icon-search-clear"></i>
               </a>
@@ -35,23 +32,20 @@
                 <button onclick="alertShowSite()" class="btn reply_markup_button" style="float: right;width:48%;">Add site</button>
                 <button onclick="alertShowAccount()" class="btn reply_markup_button" style="float: right;width:48%;margin-right: 11px;">Add account</button>
               </div>
-
               <br style="clear:both;">
-
             </div>
           </div>
 
           <div my-dialogs-list="" class="im_dialogs_col" style="height: 492px;">
             <div class="im_dialogs_wrap nano has-scrollbar">
               <div class="im_dialogs_scrollable_wrap nano-content" tabindex="-1" style="right: -10px;">
-
                 <div id="addAccount" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
                     <form id="addAccount_form" action="#add">
-                      <input style="margin-bottom: 10px;" id="addAccount_url" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Site URL" autocomplete="off">
-                      <input style="margin-bottom: 10px;" id="addAccount_email" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Email" autocomplete="off">
-                      <input style="margin-bottom: 10px;" id="addAccount_username" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Username"  autocomplete="off">
-                      <input style="margin-bottom: 10px;" id="addAccount_extra" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Extra"  autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addAccount_url" class="form-control no_outline" type="text" required placeholder="Site URL" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addAccount_email" class="form-control no_outline" type="text" required placeholder="Email" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addAccount_username" class="form-control no_outline" type="text" placeholder="Username" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addAccount_extra" class="form-control no_outline" type="text" placeholder="Extra" autocomplete="off">
                       <input hidden id="addAccount_password">
                       <div style="margin-top: 10px;">
                         <button class="btn reply_markup_button" type="submit" style="float: right;width:31%;">Add account</button>
@@ -66,8 +60,8 @@
                 <div id="addSite" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
                     <form id="addSite_form" action="#add">
-                      <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Site URL" autocomplete="off">
-                      <input style="margin-bottom: 10px;" id="addSite_name" class="form-control no_outline ng-pristine ng-untouched ng-valid" type="text" placeholder="Email" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline" type="text" required placeholder="Site URL" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addSite_name" class="form-control no_outline" type="text" required placeholder="Site Name" autocomplete="off">
                       <div style="margin-top: 10px;">
                         <button class="btn reply_markup_button" type="submit" style="float: right;width:48%;">Add site</button>
                         <button onclick="alertHideSite()" class="btn reply_markup_button" style="float: right;width:48%;margin-right: 11px;">Cancel</button>
@@ -88,12 +82,11 @@
         <div id="allAccounts" class="im_history_not_selected vertical-aligned" style="text-align: inherit;padding: 10px 10px;">
           <br><br><br><br><center><p>Choose an website</p></center>
         </div>
-
       </div>
     </div>
-    </div>
-    </div>
-    </div>
+  </div>
+  </div>
+  </div>
 
     <script src="/lib/dist/clipboard.min.js"></script>
     <script>
