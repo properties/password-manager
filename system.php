@@ -1,7 +1,7 @@
 <?php
 
   #=> Password Manager
-  #=> by Matthew (github: properties)
+  #=> by Matthew (github: @properties)
   #=> version 1.7.7
 
   #=> Include config file
