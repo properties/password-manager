@@ -41,14 +41,14 @@
               <div class="im_dialogs_scrollable_wrap nano-content" tabindex="-1" style="right: -10px;">
                 <div id="addAccount" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
-                    <form id="addAccount_form" action="#add">
+                    <form>
                       <input style="margin-bottom: 10px;" id="addAccount_url" class="form-control no_outline clearVal" type="text" placeholder="Site URL" autocomplete="off" required>
                       <input style="margin-bottom: 10px;" id="addAccount_email" class="form-control no_outline clearVal" type="text" placeholder="Email" autocomplete="off">
                       <input style="margin-bottom: 10px;" id="addAccount_username" class="form-control no_outline clearVal" type="text" placeholder="Username" autocomplete="off">
                       <input style="margin-bottom: 10px;" id="addAccount_extra" class="form-control no_outline clearVal" type="text" placeholder="Extra" autocomplete="off">
                       <input hidden id="addAccount_password">
                       <div style="margin-top: 10px;">
-                        <button class="btn reply_markup_button" type="submit" style="float: right;width:31%;">Add account</button>
+                        <button class="btn reply_markup_button fBtn" id="submitAccount" type="submit" style="float: right;width:31%;">Add account</button>
                         <button data-clipboard-text="" id="copyPassword" type="button" class="btn reply_markup_button copy" style="float: right;width:34%;margin-right: 5.5px;">Copy password</button>
                         <button type="button" class="fBtn btn reply_markup_button" id="hideAccount" style="float: right;width:31%;margin-right: 5.5px;">Cancel</button>
                       </div>
@@ -59,11 +59,11 @@
 
                 <div id="addSite" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
-                    <form id="addSite_form" action="#add">
+                    <form>
                       <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline clearVal" type="text" required placeholder="Site URL" autocomplete="off">
                       <input style="margin-bottom: 10px;" id="addSite_name" class="form-control no_outline clearVal" type="text" required placeholder="Site Name" autocomplete="off">
                       <div style="margin-top: 10px;">
-                        <button class="btn reply_markup_button" type="submit" style="float: right;width:48%;">Add site</button>
+                        <button class="btn reply_markup_button fBtn" id="submitSite" type="submit" style="float: right;width:48%;">Add site</button>
                         <button class="btn reply_markup_button fBtn" id="hideSite" style="float: right;width:48%;margin-right: 11px;">Cancel</button>
                       </div>
                     </form>
@@ -88,56 +88,60 @@
   </div>
   </div>
 
+
     <script src="/lib/dist/clipboard.min.js"></script>
     <script>
     new Clipboard('.copy');
 
-
-    // new JS
     $(document).ready(function() {
          $(".fBtn").click(function(e) {
            checkSession();
-             if(this.id == "showSite")
-             {
-               $('.clearVal').val('');
-               $("#addAccount").hide();
-               $("#addSite").show();
-             }
-             if(this.id == "showAccount")
-             {
-               $('.clearVal').val('');
-               $("#addAccount").show();
-               $("#addSite").hide();
-               randomPassword();
-             }
-             if(this.id == "hideSite")
-             {
-               $("#addSite").hide();
-             }
-             if(this.id == "hideAccount")
-             {
-               $("#addAccount").hide();
-             }
+           console.log("hi");
+
+            if(this.id == "showSite") {
+              $('.clearVal').val('');
+              $("#addAccount").hide();
+              $("#addSite").show();
+            }
+
+            if(this.id == "showAccount") {
+              $('.clearVal').val('');
+              $("#addAccount").show();
+              $("#addSite").hide();
+              randomPassword();
+            }
+
+            if(this.id == "hideSite") {
+              $("#addSite").hide();
+            }
+
+            if(this.id == "hideAccount") {
+              $("#addAccount").hide();
+            }
+
+            if(this.id == "submitSite") {
+              $.post("=system", { ACTION:"addSite", name:$("#addSite_name").val(), url:$("#addSite_url").val() }, function() {});
+              $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){$('#allSites').html(siteInfo.Html);}, "json");
+
+              $("#addSite").hide();
+              return false;
+            }
+
+            if(this.id == "submitAccount") {
+              $.post("=system", {ACTION:"addAccount",url:$("#addAccount_url").val(),email:$("#addAccount_email").val(),username:$("#addAccount_username").val(),password:$("#addAccount_password").val(),extra:$("#addAccount_extra").val()}, function() {});
+              $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){$('#allSites').html(siteInfo.Html);}, "json");
+
+              $("#addAccount").hide();
+              return false;
+            }
+
+            //if(this.id == "addAccount") {
+
+            //}
+
+
          });
     });
-
-    function getSites()
-    {
-      $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){
-        $('#allSites').html(siteInfo.Html);
-      }, "json");
-
-      return false;
-    }
-
-    function getAccounts(url)
-    {
-      $.post( "=system" , { ACTION:"getAccounts", url:url } , function( accountInfo ){
-        $('#allAccounts').html(accountInfo.Html);
-      }, "json");
-
-      return false;
-    }
 
     function checkSession()
     {
@@ -153,43 +157,13 @@
     }
 
     $(document).ready(function(){
-      getSites();
+      $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){$('#allSites').html(siteInfo.Html);}, "json");
       checkSession();
     });
 
-    $(document).ready(function(){
-      $("#addSite_form").submit(function() {
-
-        $.post("=system", {
-          ACTION:"addSite",
-          name:$("#addSite_name").val(),
-          url:$("#addSite_url").val()
-        }, function() {});
-
-        $("#addSite").hide();
-        getSites();
-
-        return false;
-      });
-
-      $("#addAccount_form").submit(function() {
-
-        $.post("=system", {
-          ACTION:"addAccount",
-          url:$("#addAccount_url").val(),
-          email:$("#addAccount_email").val(),
-          username:$("#addAccount_username").val(),
-          password:$("#addAccount_password").val(),
-          extra:$("#addAccount_extra").val()
-        }, function() {});
-
-        $("#addAccount").hide();
-        getSites();
-
-        return false;
-      });
-
-    });
+    function getAccounts(url) {
+        $.post( "=system" , { ACTION:"getAccounts", url:url } , function( accountInfo ){ $('#allAccounts').html(accountInfo.Html); }, "json");
+    }
 
 
     function randomPassword(length = 16, chars = '#aA#######') {
