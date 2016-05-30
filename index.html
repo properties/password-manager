@@ -8,16 +8,14 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 </head>
 
-<body id="showSite" style="display:none" class="non_osx non_msie is_1x">
+<body id="displaySite" style="display:none" class="non_osx non_msie is_1x">
   <br><br>
   <div class="page_wrap">
-    <div>
       <div class="tg_page_head tg_head_wrap noselect clearfix">
         <div class="tg_head_split">
           <div class="tg_head_main_wrap"></div>
         </div>
       </div>
-    </div>
 
     <div class="im_page_wrap clearfix im_page_peer_not_selected">
       <div class="im_page_split clearfix">
@@ -25,18 +23,18 @@
           <div class="im_dialogs_panel">
             <div class="im_dialogs_search">
               <input class="form-control im_dialogs_search_field no_outline" type="search" placeholder="Search" autocomplete="off">
-              <a class="im_dialogs_search_clear tg_search_clear ng-hide">
-                <i class="icon icon-search-clear"></i>
-              </a>
+              <a class="im_dialogs_search_clear tg_search_clear ng-hide"><i class="icon icon-search-clear"></i></a>
+
               <div style="margin-top: 10px;">
                 <button class="fBtn btn reply_markup_button" id="showSite" style="float: right;width:48%;">Add site</button>
                 <button class="fBtn btn reply_markup_button" id="showAccount" style="float: right;width:48%;margin-right: 11px;">Add account</button>
               </div>
+
               <br style="clear:both;">
             </div>
           </div>
 
-          <div my-dialogs-list="" class="im_dialogs_col" style="height: 492px;">
+          <div class="im_dialogs_col" style="height: 492px;">
             <div class="im_dialogs_wrap nano has-scrollbar">
               <div class="im_dialogs_scrollable_wrap nano-content" tabindex="-1" style="right: -10px;">
                 <div id="addAccount" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
@@ -48,16 +46,16 @@
                       <input style="margin-bottom: 10px;" id="addAccount_extra" class="form-control no_outline clearVal" type="text" placeholder="Extra" autocomplete="off">
                       <input hidden id="addAccount_password">
                       <div style="margin-top: 10px;">
-                        <button class="btn reply_markup_button fBtn" id="submitAccount" type="submit" style="float: right;width:31%;">Add account</button>
-                        <button data-clipboard-text="" id="copyPassword" type="button" class="btn reply_markup_button copy" style="float: right;width:34%;margin-right: 5.5px;">Copy password</button>
-                        <button type="button" class="fBtn btn reply_markup_button" id="hideAccount" style="float: right;width:31%;margin-right: 5.5px;">Cancel</button>
+                        <button class="btn reply_markup_button fBtn" id="submitAccount" type="submit" style="float:right;width:31%;">Add account</button>
+                        <button data-clipboard-text="" id="copyPassword" type="button" class="btn reply_markup_button copy" style="float:right;width:34%;margin-right:5.5px;">Copy password</button>
+                        <button type="button" class="fBtn btn reply_markup_button" id="hideAccount" style="float:right;width:31%;margin-right:5.5px;">Cancel</button>
                       </div>
                     </form>
                   </div>
                   <br><br>
                 </div>
 
-                <div id="addSite" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
+                <div id="addSite" style="display:none;padding-top:0px;padding-bottom:0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
                     <form>
                       <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline clearVal" type="text" required placeholder="Site URL" autocomplete="off">
@@ -94,87 +92,57 @@
     new Clipboard('.copy');
 
     $(document).ready(function() {
-         $(".fBtn").click(function(e) {
-           checkSession();
-           console.log("hi");
+      $(".fBtn").click(function(e) {
+        $.post("=system", { ACTION:"checkSession" }, function(checkSession) { if(!checkSession.valid) { window.location.replace("/=login#noSession"); } else { $("#displaySite").show(); } }, "json");
 
-            if(this.id == "showSite") {
-              $('.clearVal').val('');
-              $("#addAccount").hide();
-              $("#addSite").show();
-            }
-
-            if(this.id == "showAccount") {
-              $('.clearVal').val('');
-              $("#addAccount").show();
-              $("#addSite").hide();
-              randomPassword();
-            }
-
-            if(this.id == "hideSite") {
-              $("#addSite").hide();
-            }
-
-            if(this.id == "hideAccount") {
-              $("#addAccount").hide();
-            }
-
-            if(this.id == "submitSite") {
-              $.post("=system", { ACTION:"addSite", name:$("#addSite_name").val(), url:$("#addSite_url").val() }, function() {});
-              $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){$('#allSites').html(siteInfo.Html);}, "json");
-
-              $("#addSite").hide();
-              return false;
-            }
-
-            if(this.id == "submitAccount") {
-              $.post("=system", {ACTION:"addAccount",url:$("#addAccount_url").val(),email:$("#addAccount_email").val(),username:$("#addAccount_username").val(),password:$("#addAccount_password").val(),extra:$("#addAccount_extra").val()}, function() {});
-              $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){$('#allSites').html(siteInfo.Html);}, "json");
-
-              $("#addAccount").hide();
-              return false;
-            }
-
-            //if(this.id == "addAccount") {
-
-            //}
-
-
-         });
+        if(this.id == "showSite") {
+          $('.clearVal').val('');
+          $("#addAccount").hide();
+          $("#addSite").show();
+        }
+        if(this.id == "showAccount") {
+          $('.clearVal').val('');
+          $("#addAccount").show();
+          $("#addSite").hide();
+          randomPassword();
+        }
+        if(this.id == "hideSite") {
+          $("#addSite").hide();
+        }
+        if(this.id == "hideAccount") {
+          $("#addAccount").hide();
+        }
+        if(this.id == "submitSite") {
+          $.post("=system", { ACTION:"addSite", name:$("#addSite_name").val(), url:$("#addSite_url").val() }, function() {});
+          $.post("=system", { ACTION:"getSites" }, function(siteInfo){ $('#allSites').html(siteInfo.Html); }, "json");
+          $("#addSite").hide();
+          return false;
+        }
+        if(this.id == "submitAccount") {
+          $.post("=system", {ACTION:"addAccount", url:$("#addAccount_url").val(), email:$("#addAccount_email").val(), username:$("#addAccount_username").val(), password:$("#addAccount_password").val(), extra:$("#addAccount_extra").val() }, function() {});
+          $.post("=system", { ACTION:"getSites" }, function(siteInfo){ $('#allSites').html(siteInfo.Html); }, "json");
+          $("#addAccount").hide();
+          return false;
+        }
+      });
     });
 
-    function checkSession()
-    {
-      $.post( "=system" , { ACTION:"checkSession" } , function( checkSession ){
-        if(!checkSession.valid) {
-          window.location.replace("/=login#noSession");
-        } else {
-          $("#showSite").show();
-        }
-      }, "json");
-
-      return false;
-    }
-
     $(document).ready(function(){
-      $.post( "=system" , { ACTION:"getSites" } , function( siteInfo ){$('#allSites').html(siteInfo.Html);}, "json");
-      checkSession();
+      $.post("=system", { ACTION:"getSites" }, function(siteInfo) { $('#allSites').html(siteInfo.Html); }, "json");
+      $.post("=system", { ACTION:"checkSession" }, function(checkSession) { if(!checkSession.valid) { window.location.replace("/=login#noSession"); } else { $("#displaySite").show(); } }, "json");
     });
 
     function getAccounts(url) {
-        $.post( "=system" , { ACTION:"getAccounts", url:url } , function( accountInfo ){ $('#allAccounts').html(accountInfo.Html); }, "json");
+        $.post("=system", { ACTION:"getAccounts", url:url }, function(accountInfo){ $('#allAccounts').html(accountInfo.Html); }, "json");
     }
 
-
-    function randomPassword(length = 16, chars = '#aA#######') {
-      var mask = '';
+    function randomPassword(length = 16, chars = '#aA!', mask = '', result = '') {
       if (chars.indexOf('a') > -1) mask += 'abcdefghijklmnopqrstuvwxyz';
       if (chars.indexOf('A') > -1) mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       if (chars.indexOf('#') > -1) mask += '0123456789';
-      if (chars.indexOf('!') > -1) mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
-      var result = '';
+      if (chars.indexOf('!') > -1) mask += '!@#$%&*_+-=:;?,.';
       for (var i = length; i > 0; --i) result += mask[Math.round(Math.random() * (mask.length - 1))];
-      document.getElementById("addAccount_password").value = result;
+      $('#addAccount_password').val(result);
       document.getElementById('copyPassword').setAttribute('data-clipboard-text', result);
     }
 
