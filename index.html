@@ -29,8 +29,8 @@
                 <i class="icon icon-search-clear"></i>
               </a>
               <div style="margin-top: 10px;">
-                <button onclick="alertShowSite()" class="btn reply_markup_button" style="float: right;width:48%;">Add site</button>
-                <button onclick="alertShowAccount()" class="btn reply_markup_button" style="float: right;width:48%;margin-right: 11px;">Add account</button>
+                <button class="fBtn btn reply_markup_button" id="showSite" style="float: right;width:48%;">Add site</button>
+                <button class="fBtn btn reply_markup_button" id="showAccount" style="float: right;width:48%;margin-right: 11px;">Add account</button>
               </div>
               <br style="clear:both;">
             </div>
@@ -42,15 +42,15 @@
                 <div id="addAccount" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
                     <form id="addAccount_form" action="#add">
-                      <input style="margin-bottom: 10px;" id="addAccount_url" class="form-control no_outline" type="text" placeholder="Site URL" autocomplete="off" required>
-                      <input style="margin-bottom: 10px;" id="addAccount_email" class="form-control no_outline" type="text" placeholder="Email" autocomplete="off">
-                      <input style="margin-bottom: 10px;" id="addAccount_username" class="form-control no_outline" type="text" placeholder="Username" autocomplete="off">
-                      <input style="margin-bottom: 10px;" id="addAccount_extra" class="form-control no_outline" type="text" placeholder="Extra" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addAccount_url" class="form-control no_outline clearVal" type="text" placeholder="Site URL" autocomplete="off" required>
+                      <input style="margin-bottom: 10px;" id="addAccount_email" class="form-control no_outline clearVal" type="text" placeholder="Email" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addAccount_username" class="form-control no_outline clearVal" type="text" placeholder="Username" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addAccount_extra" class="form-control no_outline clearVal" type="text" placeholder="Extra" autocomplete="off">
                       <input hidden id="addAccount_password">
                       <div style="margin-top: 10px;">
                         <button class="btn reply_markup_button" type="submit" style="float: right;width:31%;">Add account</button>
                         <button data-clipboard-text="" id="copyPassword" type="button" class="btn reply_markup_button copy" style="float: right;width:34%;margin-right: 5.5px;">Copy password</button>
-                        <button onclick="alertHideAccount()" type="button" class="btn reply_markup_button" style="float: right;width:31%;margin-right: 5.5px;">Cancel</button>
+                        <button type="button" class="fBtn btn reply_markup_button" id="hideAccount" style="float: right;width:31%;margin-right: 5.5px;">Cancel</button>
                       </div>
                     </form>
                   </div>
@@ -60,11 +60,11 @@
                 <div id="addSite" style="display:none;padding-top: 0px;padding-bottom: 0px;" class="im_dialogs_panel">
                   <div class="im_dialogs_search">
                     <form id="addSite_form" action="#add">
-                      <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline" type="text" required placeholder="Site URL" autocomplete="off">
-                      <input style="margin-bottom: 10px;" id="addSite_name" class="form-control no_outline" type="text" required placeholder="Site Name" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addSite_url" class="form-control no_outline clearVal" type="text" required placeholder="Site URL" autocomplete="off">
+                      <input style="margin-bottom: 10px;" id="addSite_name" class="form-control no_outline clearVal" type="text" required placeholder="Site Name" autocomplete="off">
                       <div style="margin-top: 10px;">
                         <button class="btn reply_markup_button" type="submit" style="float: right;width:48%;">Add site</button>
-                        <button onclick="alertHideSite()" class="btn reply_markup_button" style="float: right;width:48%;margin-right: 11px;">Cancel</button>
+                        <button class="btn reply_markup_button fBtn" id="hideSite" style="float: right;width:48%;margin-right: 11px;">Cancel</button>
                       </div>
                     </form>
                   </div>
@@ -91,6 +91,35 @@
     <script src="/lib/dist/clipboard.min.js"></script>
     <script>
     new Clipboard('.copy');
+
+
+    // new JS
+    $(document).ready(function() {
+         $(".fBtn").click(function(e) {
+           checkSession();
+             if(this.id == "showSite")
+             {
+               $('.clearVal').val('');
+               $("#addAccount").hide();
+               $("#addSite").show();
+             }
+             if(this.id == "showAccount")
+             {
+               $('.clearVal').val('');
+               $("#addAccount").show();
+               $("#addSite").hide();
+               randomPassword();
+             }
+             if(this.id == "hideSite")
+             {
+               $("#addSite").hide();
+             }
+             if(this.id == "hideAccount")
+             {
+               $("#addAccount").hide();
+             }
+         });
+    });
 
     function getSites()
     {
@@ -162,31 +191,6 @@
 
     });
 
-    function
-    alertHideAccount() {
-      $("#addAccount").hide();
-    }
-
-    function alertShowAccount() {
-      $("#addAccount").show();
-      alertHideSite();
-      randomPassword();
-      document.getElementById("addAccount_url").value = "";
-      document.getElementById("addAccount_email").value = "";
-      document.getElementById("addAccount_username").value = "";
-      document.getElementById("addAccount_extra").value = "";
-    }
-
-    function alertHideSite() {
-      $("#addSite").hide();
-    }
-
-    function alertShowSite() {
-      document.getElementById("addSite_url").value = "";
-      document.getElementById("addSite_name").value = "";
-      alertHideAccount();
-      $("#addSite").show();
-    }
 
     function randomPassword(length = 16, chars = '#aA#######') {
       var mask = '';
