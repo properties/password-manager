@@ -1,6 +1,7 @@
 #Rewriting
 RewriteEngine On
-RewriteRule    ^=login?$    login.php    [NC,L]
-RewriteRule    ^=system?$    system.php    [NC,L]
+
+RewriteRule    ^login?$    login.html    [NC,L]
+RewriteRule    ^lib/system?$    lib/system.php    [NC,L]
 
 Header set X-Frame-Options DENY
