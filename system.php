@@ -1,8 +1,8 @@
 <?php
 
   #=> Password Manager
-  #=> by Matthew (github: @properties)
-  #=> version 1.7.7
+  #=> by Matthew (github: properties)
+  #=> version 1.5.2
 
   #=> Include config file
   include 'lib/config.php';
@@ -22,6 +22,12 @@
     $_SESSION = array();
     session_destroy();
     exit();
+  }
+
+  #> Make sure session is alive
+  if($_SESSION['login'] != 1)
+  {
+    define('ACTION', "checkSession");
   }
 
   #=> Define passwords and AES
@@ -102,7 +108,16 @@
       $siteAmount = $getSiteAmount->rowCount();
 
       if(empty($siteInfo["img"])) $siteInfo["img"] = 'http://'. htmlspecialchars(decryptAES($siteInfo["url"])) .'/favicon.ico';
-      $htmlCode .= '<li class="im_dialog_wrap"><a class="im_dialog" onclick="getAccounts(\''. htmlspecialchars(decryptAES($siteInfo["url"])) .'\')"><div class="im_dialog_meta pull-right text-right"><div class="im_dialog_date">'. htmlspecialchars(decryptAES($siteInfo["url"])) .'</div></div><div class="im_dialog_photo pull-left" style="border-radius:0%;"><img class="im_dialog_photo" style="border-radius:0%;" src="'. htmlspecialchars($siteInfo["img"]) .'"></div> <div class="im_dialog_message_wrap"><div class="im_dialog_peer"><span>'. htmlspecialchars(decryptAES($siteInfo["name"])) .'</span></div><div class="im_dialog_message_notyping"><div class="im_dialog_message"><span><span><span class="im_dialog_chat_from_wrap"><span class="im_dialog_chat_from">Accounts</span><span>: </span></span></span></span><span><span class="im_short_message_text">'. htmlspecialchars($siteAmount) .'</span></span></div></div></div></a></li>';
+
+      $htmlCode .= '<li class="im_dialog_wrap">
+      <a class="im_dialog fBtwn" onclick="getAccounts(\''. htmlspecialchars(decryptAES($siteInfo["url"])) .'\')">
+      <div class="im_dialog_meta pull-right text-right">
+      <div class="im_dialog_date">'. htmlspecialchars(decryptAES($siteInfo["url"])) .'</div></div>
+      <div class="im_dialog_photo pull-left" style="border-radius:0%;">
+      <img class="im_dialog_photo" style="border-radius:0%;" src="'. htmlspecialchars($siteInfo["img"]) .'"></div>
+      <div class="im_dialog_message_wrap"><div class="im_dialog_peer"><span>'. htmlspecialchars(decryptAES($siteInfo["name"])) .'</span></div>
+      <div class="im_dialog_message_notyping"><div class="im_dialog_message"><span><span><span class="im_dialog_chat_from_wrap">
+      <span class="im_dialog_chat_from">Accounts</span><span>: </span></span></span></span><span><span class="im_short_message_text">'. htmlspecialchars($siteAmount) .'</span></span></div></div></div></a></li>';
       $returnJson["Html"] = $htmlCode;
     }
   }
@@ -118,7 +133,20 @@
     {
       $hiddenPassword = "";
       for ($i = 1; $i <= strlen(decryptAES($accountInfo["password"])); $i++) $hiddenPassword .= "•";
-      $htmlCode .= '<div class="md_modal_iconed_section_wrap  md_modal_iconed_section_link"style="border-bottom: 1px solid #ebebeb;"><i class="md_modal_section_icon md_modal_section_icon_more"></i><div class="md_modal_section_select_wrap"><div class="dropdown md_modal_section_select"><button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["email"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Email:</span> ' . htmlspecialchars(decryptAES($accountInfo["email"])) . '</div></div><div class="md_modal_section_select_wrap"><div class="dropdown md_modal_section_select"><button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["username"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Username:</span> ' . htmlspecialchars(decryptAES($accountInfo["username"])) . '</div></div><div class="md_modal_section_select_wrap"><div class="dropdown md_modal_section_select"><button data-clipboard-text="'. htmlspecialchars(decryptAES($accountInfo["password"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Password:</span> '. $hiddenPassword . '</div></div><div class="md_modal_section_select_wrap"><div class="dropdown md_modal_section_select"><button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["extra"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button></div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Extra:</span> ' . htmlspecialchars(decryptAES($accountInfo["extra"])) . '</div></div></div>';
+      $htmlCode .= '<div class="md_modal_iconed_section_wrap  md_modal_iconed_section_link"style="border-bottom: 1px solid #ebebeb;">
+      <i class="md_modal_section_icon md_modal_section_icon_more"></i>
+      <div class="md_modal_section_select_wrap"><div class="dropdown md_modal_section_select">
+      <button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["email"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button>
+      </div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Email:</span> ' . htmlspecialchars(decryptAES($accountInfo["email"])) . '</div></div>
+      <div class="md_modal_section_select_wrap"><div class="dropdown md_modal_section_select">
+      <button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["username"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button>
+      </div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Username:</span> ' . htmlspecialchars(decryptAES($accountInfo["username"])) . '</div></div>
+      <div class="md_modal_section_select_wrap"><div class="dropdown md_modal_section_select">
+      <button data-clipboard-text="'. htmlspecialchars(decryptAES($accountInfo["password"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button>
+      </div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Password:</span> '. $hiddenPassword . '</div></div><div class="md_modal_section_select_wrap">
+      <div class="dropdown md_modal_section_select">
+      <button data-clipboard-text="' . htmlspecialchars(decryptAES($accountInfo["extra"])) . '" class="btn btn-link dropdown-toggle copy">Copy</button>
+      </div><div class="md_modal_section_param_name"><span style="color: #3a6d99;">Extra:</span> ' . htmlspecialchars(decryptAES($accountInfo["extra"])) . '</div></div></div>';
     }
     $returnJson["Html"] = $htmlCode;
   }
