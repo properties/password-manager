@@ -106,7 +106,7 @@
 
     $(document).ready(function() {
       $(".fBtn").click(function(e) {
-        $.post("=system", { ACTION:"checkSession" }, function(checkSession) { if(!checkSession.valid) { window.location.replace("/=login#noSession"); } else { $("#displaySite").show(); } }, "json");
+        $.post("lib/system", { ACTION:"checkSession" }, function(checkSession) { if(!checkSession.valid) { window.location.replace("/login"); } else { $("#displaySite").show(); } }, "json");
 
         if(this.id == "showSite") {
           $('.clearVal').val('');
@@ -126,14 +126,14 @@
           $("#addAccount").hide();
         }
         if(this.id == "submitSite") {
-          $.post("=system", { ACTION:"addSite", name:$("#addSite_name").val(), url:$("#addSite_url").val() }, function() {});
-          $.post("=system", { ACTION:"getSites" }, function(siteInfo){ $('#allSites').html(siteInfo.Html); }, "json");
+          $.post("lib/system", { ACTION:"addSite", name:$("#addSite_name").val(), url:$("#addSite_url").val() }, function() {});
+          $.post("lib/system", { ACTION:"getSites" }, function(siteInfo){ $('#allSites').html(siteInfo.Html); }, "json");
           $("#addSite").hide();
           return false;
         }
         if(this.id == "submitAccount") {
-          $.post("=system", {ACTION:"addAccount", url:$("#addAccount_url").val(), email:$("#addAccount_email").val(), username:$("#addAccount_username").val(), password:$("#addAccount_password").val(), extra:$("#addAccount_extra").val() }, function() {});
-          $.post("=system", { ACTION:"getSites" }, function(siteInfo){ $('#allSites').html(siteInfo.Html); }, "json");
+          $.post("lib/system", {ACTION:"addAccount", url:$("#addAccount_url").val(), email:$("#addAccount_email").val(), username:$("#addAccount_username").val(), password:$("#addAccount_password").val(), extra:$("#addAccount_extra").val() }, function() {});
+          $.post("lib/system", { ACTION:"getSites" }, function(siteInfo){ $('#allSites').html(siteInfo.Html); }, "json");
           $("#addAccount").hide();
           return false;
         }
@@ -141,12 +141,12 @@
     });
 
     $(document).ready(function(){
-      $.post("=system", { ACTION:"getSites" }, function(siteInfo) { $('#allSites').html(siteInfo.Html); }, "json");
-      $.post("=system", { ACTION:"checkSession" }, function(checkSession) { if(!checkSession.valid) { window.location.replace("/=login#noSession"); } else { $("#displaySite").show(); } }, "json");
+      $.post("lib/system", { ACTION:"getSites" }, function(siteInfo) { $('#allSites').html(siteInfo.Html); }, "json");
+      $.post("lib/system", { ACTION:"checkSession" }, function(checkSession) { if(!checkSession.valid) { window.location.replace("/login"); } else { $("#displaySite").show(); } }, "json");
     });
 
     function getAccounts(url) {
-        $.post("=system", { ACTION:"getAccounts", url:url }, function(accountInfo){ $('#allAccounts').html(accountInfo.Html); }, "json");
+        $.post("lib/system", { ACTION:"getAccounts", url:url }, function(accountInfo){ $('#allAccounts').html(accountInfo.Html); }, "json");
     }
 
     function randomPassword(length = 16, chars = '#aA!', mask = '', result = '') {
