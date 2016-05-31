@@ -2,7 +2,7 @@
 
   #=> Password Manager
   #=> by Matthew (github: properties)
-  #=> version 1.7.9
+  #=> version 1.7.9.1
 
   #=> Include config file
   include 'config.php';
@@ -25,7 +25,7 @@
   }
 
   #> Make sure session is alive
-  if($_SESSION['login'] != 1)
+  if($_SESSION['login'] != 1 && $_POST['ACTION'] != "generateQR" && $_POST['ACTION'] != "loginAccount" && $_POST['ACTION'] != "installSite")
   {
     define('ACTION', "checkSession");
   }
