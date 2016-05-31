@@ -45,7 +45,7 @@
   <script>
     function generateQR()
     {
-      $.post( "=system" , { ACTION: "generateQR" } , function( QRInfo ){
+      $.post( "lib/system" , { ACTION: "generateQR" } , function( QRInfo ){
         $('#QRCode').html(QRInfo.imageQR);
         $('#divAuth').html(QRInfo.secretQR);
       }, "json");
@@ -60,7 +60,7 @@
     $(document).ready(function(){
       $("#installSite").submit(function() {
 
-        $.post("=system", {
+        $.post("lib/system", {
 
           ACTION:"installSite",
 
@@ -70,7 +70,7 @@
 
         }, function(postInfo) {
           alert("Install completed! You can now login");
-          window.location.replace("/=login#installComplete");
+          window.location.replace("/login");
         },"json");
 
         return false;
