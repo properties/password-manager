@@ -1,4 +1,3 @@
-#Rewriting
 RewriteEngine On
 
 RewriteRule    ^login?$    login.html    [NC,L]
