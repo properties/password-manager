@@ -15,6 +15,7 @@ First step, open lib/config.php,  and define database information and site url (
   define('dbName', 'properties_db');
   define('dbUser', 'properties_user');
   define('dbPassword', 'coolgithub');
+  
 ```
 
 After you defined your information, open install.html in your browser.
