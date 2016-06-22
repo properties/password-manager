@@ -1,6 +1,6 @@
 <?php
 
-  #=> Password Manager
+  #=> Password Manager 
   #=> by Matthew (github: properties)
   #=> version 1.7.9.1
 
